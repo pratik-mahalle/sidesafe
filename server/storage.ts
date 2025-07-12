@@ -274,7 +274,8 @@ export class MemStorage implements IStorage {
 
 import { FirebaseStorage } from './services/firebase-storage';
 
-// Use Firebase Storage in production, MemStorage for development
-export const storage = process.env.NODE_ENV === 'production' 
-  ? new FirebaseStorage() 
-  : new MemStorage();
+// Use MemStorage for development, can be switched to Firebase for production
+export const storage = new MemStorage();
+
+// Uncomment the line below and comment the line above to use Firebase
+// export const storage = new FirebaseStorage();

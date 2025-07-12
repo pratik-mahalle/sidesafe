@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 13%, 16%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215, 13%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 13%, 16%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 13%, 16%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(12, 94%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(148, 53%, 37%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(210, 40%, 98%);
+  --accent-foreground: hsl(210, 13%, 16%);
+  --destructive: hsl(354, 70%, 54%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(45, 93%, 47%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(210, 13%, 16%);
+  --radius: 0.5rem;
+  
+  /* Custom safety colors */
+  --safety-orange: hsl(12, 94%, 60%);
+  --trustworthy-green: hsl(148, 53%, 37%);
+  --emergency-red: hsl(354, 70%, 54%);
+  --safe-green: hsl(142, 71%, 45%);
+  --text-dark: hsl(210, 13%, 16%);
+  --bg-light: hsl(210, 17%, 98%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(12, 94%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(148, 53%, 37%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(354, 70%, 54%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(45, 93%, 47%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  
+  /* Custom safety colors for dark mode */
+  --safety-orange: hsl(12, 94%, 60%);
+  --trustworthy-green: hsl(148, 53%, 37%);
+  --emergency-red: hsl(354, 70%, 54%);
+  --safe-green: hsl(142, 71%, 45%);
+  --text-dark: hsl(0, 0%, 98%);
+  --bg-light: hsl(240, 10%, 3.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  }
+
+  .safety-orange {
+    color: var(--safety-orange);
+  }
+
+  .bg-safety-orange {
+    background-color: var(--safety-orange);
+  }
+
+  .trustworthy-green {
+    color: var(--trustworthy-green);
+  }
+
+  .bg-trustworthy-green {
+    background-color: var(--trustworthy-green);
+  }
+
+  .emergency-red {
+    color: var(--emergency-red);
+  }
+
+  .bg-emergency-red {
+    background-color: var(--emergency-red);
+  }
+
+  .safe-green {
+    color: var(--safe-green);
+  }
+
+  .bg-safe-green {
+    background-color: var(--safe-green);
+  }
+
+  .text-dark {
+    color: var(--text-dark);
+  }
+
+  .bg-light {
+    background-color: var(--bg-light);
+  }
+}
+
+@layer components {
+  .sos-button {
+    @apply w-32 h-32 rounded-full text-4xl font-bold shadow-lg transform hover:scale-105 transition-all duration-200;
+    background-color: var(--emergency-red);
+    color: white;
+  }
+
+  .sos-button:hover {
+    background-color: hsl(354, 70%, 50%);
+  }
+
+  .sos-button:active {
+    transform: scale(0.95);
+  }
+
+  .safety-card {
+    @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow;
+  }
+
+  .offline-banner {
+    @apply fixed top-16 left-0 right-0 text-white text-center py-2 px-4 transform -translate-y-full transition-transform duration-300 z-40;
+    background-color: var(--warning);
+  }
+
+  .offline-banner.visible {
+    transform: translateY(0);
+  }
+
+  .network-indicator {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  .network-indicator.online {
+    background-color: var(--safe-green);
+  }
+
+  .network-indicator.offline {
+    background-color: var(--warning);
+  }
+
+  .status-indicator {
+    @apply w-4 h-4 rounded-full;
+  }
+
+  .status-indicator.safe {
+    background-color: var(--safe-green);
+  }
+
+  .status-indicator.warning {
+    background-color: var(--warning);
+  }
+
+  .status-indicator.danger {
+    background-color: var(--emergency-red);
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* High contrast mode for accessibility */
+@media (prefers-contrast: high) {
+  .safety-card {
+    @apply border-2 border-gray-400;
+  }
+  
+  .sos-button {
+    @apply border-4 border-black;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sos-button {
+    transition: none;
+  }
+  
+  .sos-button:hover {
+    transform: none;
+  }
+}

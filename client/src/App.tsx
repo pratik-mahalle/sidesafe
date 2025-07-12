@@ -4,7 +4,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useOffline } from "@/hooks/use-offline";
+import { useAuth } from "@/hooks/use-auth";
 import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 // Pages
 import Home from "@/pages/home";
@@ -17,8 +19,26 @@ import NotFound from "@/pages/not-found";
 // Layout Components
 import Header from "@/components/layout/header";
 import BottomNavigation from "@/components/layout/bottom-navigation";
+import AuthWrapper from "@/components/auth/auth-wrapper";
 
 function Router() {
+  const { user, loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-light flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#FF6B35]" />
+          <p className="text-gray-600">Loading RakshaSahayak...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AuthWrapper onSuccess={() => {}} />;
+  }
+
   return (
     <div className="min-h-screen bg-light">
       <Header />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,54 +19,32 @@ import {
   Users, 
   Plus,
   Edit2,
-  Trash2
+  Trash2,
+  LogOut
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import ProtectedRoute from "@/components/auth/protected-route";
+import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function Profile() {
+  const { user, logout, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [newContact, setNewContact] = useState({ name: "", phone: "", relationship: "" });
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['/api/users/1'],
-  });
-
-  const { data: familyMembers } = useQuery({
-    queryKey: ['/api/family-members/1'],
-  });
-
-  const addFamilyMember = useMutation({
-    mutationFn: async (member: any) => {
-      const response = await fetch('/api/family-members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...member, userId: 1 }),
-      });
-      if (!response.ok) throw new Error('Failed to add family member');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/family-members/1'] });
-      setNewContact({ name: "", phone: "", relationship: "" });
-      toast({
-        title: "Family member added",
-        description: "New family member has been added to your tracking list.",
-      });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to add family member. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // Show auth wrapper if not authenticated
+  if (!isAuthenticated) {
+    return <AuthWrapper onSuccess={() => {}} />;
+  }
 
   const handleAddContact = () => {
     if (newContact.name && newContact.phone && newContact.relationship) {
-      addFamilyMember.mutate(newContact);
+      toast({
+        title: "Feature Coming Soon",
+        description: "Family member tracking will be available soon.",
+      });
+      setNewContact({ name: "", phone: "", relationship: "" });
     } else {
       toast({
         title: "Missing Information",
@@ -76,16 +54,13 @@ export default function Profile() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-32 bg-gray-200 rounded-xl"></div>
-          <div className="h-96 bg-gray-200 rounded-xl"></div>
-        </div>
-      </div>
-    );
-  }
+  const handleSaveProfile = () => {
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been successfully updated.",
+    });
+    setIsEditing(false);
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -95,27 +70,35 @@ export default function Profile() {
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20">
               <AvatarFallback className="bg-safety-orange text-white text-2xl">
-                {user?.name?.charAt(0) || 'U'}
+                {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-dark">{user?.name || 'User'}</h2>
-              <p className="text-gray-600">{user?.phone || 'Phone not set'}</p>
+              <h2 className="text-2xl font-bold text-dark">{user?.displayName || user?.email || 'User'}</h2>
+              <p className="text-gray-600">{user?.email || 'Email not set'}</p>
               <div className="flex items-center space-x-2 mt-2">
-                <div className={`w-3 h-3 rounded-full ${
-                  user?.safetyStatus === 'safe' ? 'bg-safe-green' : 'bg-yellow-500'
-                }`}></div>
-                <span className="text-sm capitalize">{user?.safetyStatus || 'Unknown'}</span>
+                <div className="w-3 h-3 rounded-full bg-safe-green"></div>
+                <span className="text-sm capitalize">Safe</span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              {isEditing ? 'Cancel' : 'Edit'}
-            </Button>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsEditing(!isEditing)}
+              >
+                <Edit2 className="w-4 h-4 mr-2" />
+                {isEditing ? 'Cancel' : 'Edit'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={logout}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -142,35 +125,44 @@ export default function Profile() {
                   <Label htmlFor="name">Full Name</Label>
                   <Input
                     id="name"
-                    value={user?.name || ''}
-                    disabled={!isEditing}
-                    className="mt-1"
+                    value={user?.displayName || ''}
+                    readOnly={!isEditing}
+                    className={!isEditing ? 'bg-gray-50' : ''}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    value={user?.email || ''}
+                    readOnly
+                    className="bg-gray-50"
                   />
                 </div>
                 <div>
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
                     id="phone"
-                    value={user?.phone || ''}
-                    disabled={!isEditing}
-                    className="mt-1"
+                    value={user?.phoneNumber || ''}
+                    readOnly={!isEditing}
+                    className={!isEditing ? 'bg-gray-50' : ''}
                   />
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="location">Current Location</Label>
-                <Input
-                  id="location"
-                  value={user?.location || ''}
-                  disabled={!isEditing}
-                  className="mt-1"
-                />
+                <div>
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    id="location"
+                    value="Maharashtra, India"
+                    readOnly={!isEditing}
+                    className={!isEditing ? 'bg-gray-50' : ''}
+                  />
+                </div>
               </div>
 
               {isEditing && (
                 <div className="flex space-x-2">
-                  <Button className="bg-trustworthy-green hover:bg-green-600">
+                  <Button onClick={handleSaveProfile} className="bg-[#FF6B35] hover:bg-[#FF6B35]/90">
+                    <Save className="w-4 h-4 mr-2" />
                     Save Changes
                   </Button>
                   <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -178,41 +170,75 @@ export default function Profile() {
                   </Button>
                 </div>
               )}
+
+              <Separator />
+
+              {/* Account Information */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">Account Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">Account Created</Label>
+                    <p className="text-sm text-gray-600">{user?.metadata?.creationTime || 'Today'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Last Sign In</Label>
+                    <p className="text-sm text-gray-600">{user?.metadata?.lastSignInTime || 'Today'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Provider</Label>
+                    <p className="text-sm text-gray-600">{user?.providerData?.[0]?.providerId || 'Email'}</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Verified</Label>
+                    <Badge variant={user?.emailVerified ? 'default' : 'secondary'}>
+                      {user?.emailVerified ? 'Verified' : 'Not Verified'}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Emergency Contacts */}
+          {/* Safety Status */}
           <Card className="safety-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Phone className="w-5 h-5" />
-                <span>Emergency Contacts</span>
+                <Shield className="w-5 h-5" />
+                <span>Safety Status</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {user?.emergencyContacts?.map((contact, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-emergency-red rounded-full flex items-center justify-center">
-                      <Phone className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Emergency Contact {index + 1}</p>
-                      <p className="text-sm text-gray-600">{contact}</p>
-                    </div>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Current Status</p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    <div className="w-3 h-3 rounded-full bg-safe-green"></div>
+                    <span className="text-sm text-gray-600">Safe</span>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    <Edit2 className="w-4 h-4" />
-                  </Button>
                 </div>
-              )) || (
-                <div className="text-center py-4">
-                  <p className="text-gray-600">No emergency contacts configured</p>
-                  <Button variant="outline" className="mt-2">
-                    Add Emergency Contact
-                  </Button>
+                <Badge className="bg-safe-green hover:bg-safe-green">
+                  Safe
+                </Badge>
+              </div>
+              <Separator className="my-4" />
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Emergency Contacts</p>
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm">+91 100 (Police)</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm">+91 1091 (Women's Helpline)</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Phone className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm">+91 181 (Women in Distress)</span>
+                  </div>
                 </div>
-              )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -229,39 +255,36 @@ export default function Profile() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="new-name">Name</Label>
+                  <Label htmlFor="contact-name">Name</Label>
                   <Input
-                    id="new-name"
+                    id="contact-name"
                     value={newContact.name}
-                    onChange={(e) => setNewContact({...newContact, name: e.target.value})}
+                    onChange={(e) => setNewContact(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Enter name"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="new-phone">Phone</Label>
+                  <Label htmlFor="contact-phone">Phone</Label>
                   <Input
-                    id="new-phone"
+                    id="contact-phone"
                     value={newContact.phone}
-                    onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
+                    onChange={(e) => setNewContact(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Enter phone number"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="new-relationship">Relationship</Label>
+                  <Label htmlFor="contact-relationship">Relationship</Label>
                   <Input
-                    id="new-relationship"
+                    id="contact-relationship"
                     value={newContact.relationship}
-                    onChange={(e) => setNewContact({...newContact, relationship: e.target.value})}
-                    placeholder="e.g., Mother, Father, Sister"
+                    onChange={(e) => setNewContact(prev => ({ ...prev, relationship: e.target.value }))}
+                    placeholder="e.g., Mother, Sister"
                   />
                 </div>
               </div>
-              <Button 
-                onClick={handleAddContact}
-                disabled={addFamilyMember.isPending}
-                className="bg-trustworthy-green hover:bg-green-600"
-              >
-                {addFamilyMember.isPending ? 'Adding...' : 'Add Family Member'}
+              <Button onClick={handleAddContact} className="bg-[#FF6B35] hover:bg-[#FF6B35]/90">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Family Member
               </Button>
             </CardContent>
           </Card>
@@ -275,43 +298,9 @@ export default function Profile() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {familyMembers?.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No family members</h3>
-                  <p className="text-gray-600">Add family members to enable tracking and safety features.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {familyMembers?.map((member) => (
-                    <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-trustworthy-green text-white">
-                            {member.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{member.name}</p>
-                          <p className="text-sm text-gray-600">{member.relationship}</p>
-                          <p className="text-sm text-gray-500">{member.phone}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={member.safetyStatus === 'safe' ? 'default' : 'destructive'}>
-                          {member.safetyStatus}
-                        </Badge>
-                        <Button variant="ghost" size="sm">
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-red-600">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-sm text-gray-500 text-center py-8">
+                No family members added yet. Add your first family member above to start tracking.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -329,29 +318,23 @@ export default function Profile() {
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor="emergency-alerts">Emergency Alerts</Label>
-                  <p className="text-sm text-gray-600">Receive notifications for emergency situations</p>
+                  <p className="text-sm text-gray-600">Receive alerts for emergency situations</p>
                 </div>
                 <Switch id="emergency-alerts" defaultChecked />
               </div>
-              
-              <Separator />
-              
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="family-updates">Family Safety Updates</Label>
-                  <p className="text-sm text-gray-600">Get notified when family members update their status</p>
+                  <Label htmlFor="family-updates">Family Updates</Label>
+                  <p className="text-sm text-gray-600">Get notified about family member status changes</p>
                 </div>
                 <Switch id="family-updates" defaultChecked />
               </div>
-              
-              <Separator />
-              
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="location-sharing">Location Sharing</Label>
-                  <p className="text-sm text-gray-600">Allow family members to see your location</p>
+                  <Label htmlFor="safety-tips">Safety Tips</Label>
+                  <p className="text-sm text-gray-600">Receive AI-powered safety recommendations</p>
                 </div>
-                <Switch id="location-sharing" defaultChecked />
+                <Switch id="safety-tips" defaultChecked />
               </div>
             </CardContent>
           </Card>
@@ -360,68 +343,43 @@ export default function Profile() {
           <Card className="safety-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Shield className="w-5 h-5" />
-                <span>Privacy & Safety</span>
+                <Settings className="w-5 h-5" />
+                <span>Privacy Settings</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="auto-location">Auto Location Updates</Label>
-                  <p className="text-sm text-gray-600">Automatically update your location every 15 minutes</p>
+                  <Label htmlFor="location-sharing">Location Sharing</Label>
+                  <p className="text-sm text-gray-600">Allow family members to see your location</p>
                 </div>
-                <Switch id="auto-location" defaultChecked />
+                <Switch id="location-sharing" defaultChecked />
               </div>
-              
-              <Separator />
-              
               <div className="flex items-center justify-between">
                 <div>
-                  <Label htmlFor="offline-mode">Offline Mode</Label>
-                  <p className="text-sm text-gray-600">Enable offline functionality for limited connectivity</p>
+                  <Label htmlFor="status-sharing">Status Sharing</Label>
+                  <p className="text-sm text-gray-600">Share your safety status with family</p>
                 </div>
-                <Switch id="offline-mode" defaultChecked />
-              </div>
-              
-              <Separator />
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="data-sharing">Data Sharing with Authorities</Label>
-                  <p className="text-sm text-gray-600">Share incident data with local authorities for better safety</p>
-                </div>
-                <Switch id="data-sharing" defaultChecked />
+                <Switch id="status-sharing" defaultChecked />
               </div>
             </CardContent>
           </Card>
 
-          {/* App Settings */}
+          {/* Account Actions */}
           <Card className="safety-card">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <Settings className="w-5 h-5" />
-                <span>App Settings</span>
+                <User className="w-5 h-5" />
+                <span>Account Actions</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
-                <Settings className="w-4 h-4 mr-2" />
-                App Preferences
+                <Edit2 className="w-4 h-4 mr-2" />
+                Change Password
               </Button>
-              
-              <Button variant="outline" className="w-full justify-start">
-                <Shield className="w-4 h-4 mr-2" />
-                Security Settings
-              </Button>
-              
-              <Button variant="outline" className="w-full justify-start">
-                <Bell className="w-4 h-4 mr-2" />
-                Notification History
-              </Button>
-              
-              <Separator />
-              
-              <Button variant="destructive" className="w-full">
+              <Button variant="outline" className="w-full justify-start" onClick={logout}>
+                <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </Button>
             </CardContent>

@@ -6,16 +6,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Phone, Clock, Shield, Users, Navigation } from "lucide-react";
 import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function Tracking() {
+  const { user, isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
+  
+  if (!isAuthenticated) {
+    return <AuthWrapper onSuccess={() => {}} />;
+  }
 
   const { data: familyMembers, isLoading } = useQuery({
     queryKey: ['/api/family-members/1'],
   });
 
-  const { data: user } = useQuery({
+  const { data: userData } = useQuery({
     queryKey: ['/api/users/1'],
   });
 

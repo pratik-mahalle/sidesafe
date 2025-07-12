@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import AuthWrapper from "@/components/auth/auth-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +25,13 @@ import Recommendations from "@/components/safety/recommendations";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { data: user, isLoading: userLoading } = useQuery({
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <AuthWrapper onSuccess={() => {}} />;
+  }
+
+  const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ['/api/users/1'],
   });
 
@@ -73,7 +81,7 @@ export default function Home() {
             <p className="text-gray-600">Press and hold for 3 seconds to send emergency alert</p>
             <SOSButton />
             <p className="text-sm text-gray-500">
-              Emergency contacts: {user?.emergencyContacts?.length || 0} configured
+              Emergency contacts: {userData?.emergencyContacts?.length || 0} configured
             </p>
           </div>
         </CardContent>
@@ -85,10 +93,10 @@ export default function Home() {
         <Card className="safety-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-lg">Safety Status</CardTitle>
-            <div className={`status-indicator ${user?.safetyStatus || 'safe'}`}></div>
+            <div className={`status-indicator ${userData?.safetyStatus || 'safe'}`}></div>
           </CardHeader>
           <CardContent>
-            <SafetyStatus user={user} />
+            <SafetyStatus user={userData} />
           </CardContent>
         </Card>
 

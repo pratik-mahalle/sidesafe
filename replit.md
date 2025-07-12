@@ -8,6 +8,16 @@ RakshaSahayak is a comprehensive women's safety platform designed specifically f
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+### Firebase Integration (January 2025)
+- ✓ Added Firebase Database integration with Firestore
+- ✓ Created Firebase Storage service for real-time data sync
+- ✓ Implemented Firebase hooks for real-time updates
+- ✓ Added security rules for data protection
+- ✓ Configured automatic switching between Firebase (production) and MemStorage (development)
+- ✓ Added Firebase configuration files and deployment settings
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -22,10 +32,11 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js
 - **Language**: TypeScript with ES modules
-- **Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon Database (serverless PostgreSQL)
-- **API Structure**: RESTful API with JSON responses
-- **Session Management**: PostgreSQL-based session storage using connect-pg-simple
+- **Database**: Firebase Firestore (production) / In-memory storage (development)
+- **Database Provider**: Google Firebase (cloud-native NoSQL)
+- **API Structure**: RESTful API with JSON responses + Firebase real-time sync
+- **Session Management**: Firebase Authentication
+- **Storage**: Cloud Firestore with real-time updates
 
 ### PWA Features
 - **Service Worker**: Custom service worker for offline functionality
@@ -51,6 +62,8 @@ Preferred communication style: Simple, everyday language.
 
 ### External Integrations
 - **Google Gemini AI**: For generating contextual safety recommendations
+- **Firebase Database**: For real-time data synchronization and cloud storage
+- **Firebase Storage**: For evidence files and media uploads
 - **Geolocation API**: For location tracking and sharing
 - **Service Worker**: For offline functionality and push notifications
 

@@ -9,16 +9,11 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import IncidentForm from "@/components/safety/incident-form";
 import { useAuth } from "@/hooks/use-auth";
-import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function Reports() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("report");
-  
-  if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
-  }
 
   const { data: userIncidents, isLoading } = useQuery({
     queryKey: ['/api/incidents/user/1'],

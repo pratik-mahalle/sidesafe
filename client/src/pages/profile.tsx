@@ -23,20 +23,13 @@ import {
   LogOut
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import ProtectedRoute from "@/components/auth/protected-route";
-import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function Profile() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [newContact, setNewContact] = useState({ name: "", phone: "", relationship: "" });
-
-  // Show auth wrapper if not authenticated
-  if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
-  }
 
   const handleAddContact = () => {
     if (newContact.name && newContact.phone && newContact.relationship) {

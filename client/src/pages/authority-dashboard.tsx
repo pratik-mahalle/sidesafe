@@ -25,18 +25,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
-import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function AuthorityDashboard() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedIncident, setSelectedIncident] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState("all");
-  
-  if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
-  }
 
   const { data: incidents, isLoading: incidentsLoading } = useQuery({
     queryKey: ['/api/incidents'],

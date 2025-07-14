@@ -8,16 +8,11 @@ import { MapPin, Phone, Clock, Shield, Users, Navigation } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import AuthWrapper from "@/components/auth/auth-wrapper";
 
 export default function Tracking() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [selectedMember, setSelectedMember] = useState<number | null>(null);
-  
-  if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
-  }
 
   const { data: familyMembers, isLoading } = useQuery({
     queryKey: ['/api/family-members/1'],

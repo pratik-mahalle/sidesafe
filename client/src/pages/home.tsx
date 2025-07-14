@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
-import AuthWrapper from "@/components/auth/auth-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,11 +24,7 @@ import Recommendations from "@/components/safety/recommendations";
 import { Link } from "wouter";
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
-  
-  if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
-  }
+  const { user } = useAuth();
 
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ['/api/users/1'],

@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Clock, AlertTriangle, Camera } from "lucide-react";
+import { MapPin, Clock, AlertTriangle, Camera, Phone } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "@/hooks/use-location";
+import { useAuth } from "@/hooks/use-auth";
 
 const incidentSchema = z.object({
   type: z.string().min(1, "Please select an incident type"),
@@ -25,6 +26,7 @@ const incidentSchema = z.object({
 type IncidentFormData = z.infer<typeof incidentSchema>;
 
 export default function IncidentForm() {
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { location: currentLocation } = useLocation();
 
@@ -53,14 +55,14 @@ export default function IncidentForm() {
       const response = await fetch('/api/incidents', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, userId: 1 }),
+        body: JSON.stringify({ ...data, userId: user?.id }),
       });
       if (!response.ok) throw new Error('Failed to submit incident');
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/incidents'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/incidents/user/1'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/incidents/user', user?.id] });
       toast({
         title: "Incident Reported",
         description: "Your incident report has been submitted successfully. Authorities will be notified.",

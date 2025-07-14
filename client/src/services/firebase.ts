@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAg0sl524ZqQt8w5x7dNZBrUahSqr0mbgE",
   authDomain: "safeshield-891d7.firebaseapp.com",
   projectId: "safeshield-891d7",
-  storageBucket: "safeshield-891d7.firebasestorage.app",
+  storageBucket: "safeshield-891d7.appspot.com", // FIXED typo here
   messagingSenderId: "27017776092",
   appId: "1:27017776092:web:2569160b3da949d9549d19",
   measurementId: "G-ZLTS2FBDFQ"

@@ -19,7 +19,7 @@ export default function SOSButton() {
         body: JSON.stringify({
           userId: 1,
           location: location || "Location unavailable",
-          alertedContacts: ["+919876543211", "+919876543212"]
+          alertedContacts: ["+919579561987", "+919579455452"]
         }),
       });
       if (!response.ok) throw new Error('Failed to trigger emergency alert');

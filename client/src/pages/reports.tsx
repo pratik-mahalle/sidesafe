@@ -16,7 +16,8 @@ export default function Reports() {
   const [activeTab, setActiveTab] = useState("report");
 
   const { data: userIncidents, isLoading } = useQuery({
-    queryKey: ['/api/incidents/user/1'],
+    queryKey: ['/api/incidents/user', user?.id],
+    enabled: !!user?.id,
   });
 
   const formatDate = (dateString: string) => {

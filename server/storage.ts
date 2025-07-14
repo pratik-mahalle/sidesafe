@@ -51,8 +51,8 @@ export class MemStorage implements IStorage {
     // Create sample user
     const user1: User = {
       id: 1,
-      name: "Priya Sharma",
-      phone: "+919876543210",
+      name: "Abhishek Katale  ",
+      phone: "+919579455452 ",
       emergencyContacts: ["+919876543211", "+919876543212"],
       location: "Pune, Maharashtra",
       safetyStatus: "safe",
@@ -77,8 +77,8 @@ export class MemStorage implements IStorage {
     const family2: FamilyMember = {
       id: 2,
       userId: 1,
-      name: "Rajesh Sharma",
-      phone: "+919876543212",
+      name: "Abhishek Katale",
+      phone: "+919579455452",
       relationship: "Father",
       location: "Pune, Maharashtra",
       safetyStatus: "safe",

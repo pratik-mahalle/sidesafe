@@ -27,7 +27,8 @@ export default function Home() {
   const { user } = useAuth();
 
   const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ['/api/users/1'],
+    queryKey: ['/api/users', user?.id],
+    enabled: !!user?.id,
   });
 
   const { data: incidents, isLoading: incidentsLoading } = useQuery({
@@ -41,7 +42,7 @@ export default function Home() {
   const emergencyContacts = [
     { name: "Police", number: "100", icon: Phone, color: "bg-emergency-red" },
     { name: "Women Helpline", number: "1091", icon: Shield, color: "bg-pink-500" },
-    { name: "Rajesh Sharma", number: "+91 98765 43210", icon: Users, color: "bg-trustworthy-green" },
+    { name: "Abhishek Katale", number: "+91 9579455452", icon: Users, color: "bg-trustworthy-green" },
   ];
 
   const safetyTips = [

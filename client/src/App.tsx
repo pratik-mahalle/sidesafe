@@ -14,6 +14,8 @@ import Tracking from "@/pages/tracking";
 import Reports from "@/pages/reports";
 import Profile from "@/pages/profile";
 import AuthorityDashboard from "@/pages/authority-dashboard";
+import Login from "@/pages/login";
+import Signup from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 // Layout Components
@@ -35,15 +37,25 @@ function Router() {
     );
   }
 
+  // Show login/signup pages when not authenticated
   if (!isAuthenticated) {
-    return <AuthWrapper onSuccess={() => {}} />;
+    return (
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route path="/signup" component={Signup} />
+        <Route component={Login} /> {/* Default to login for all other routes */}
+      </Switch>
+    );
   }
 
+  // Show main app when authenticated
   return (
     <div className="min-h-screen bg-light">
       <Header />
       <main className="pb-20 md:pb-0">
         <Switch>
+          <Route path="/login" component={() => <div>Redirecting...</div>} />
+          <Route path="/signup" component={() => <div>Redirecting...</div>} />
           <Route path="/" component={Home} />
           <Route path="/tracking" component={Tracking} />
           <Route path="/reports" component={Reports} />

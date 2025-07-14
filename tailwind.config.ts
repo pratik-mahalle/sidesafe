@@ -51,6 +51,13 @@ export default {
           "4": "var(--chart-4)",
           "5": "var(--chart-5)",
         },
+        // Custom safety colors
+        "safety-orange": "var(--safety-orange)",
+        "trustworthy-green": "var(--trustworthy-green)",
+        "emergency-red": "var(--emergency-red)",
+        "safe-green": "var(--safe-green)",
+        "text-dark": "var(--text-dark)",
+        "light": "var(--bg-light)",
         sidebar: {
           DEFAULT: "var(--sidebar-background)",
           foreground: "var(--sidebar-foreground)",
